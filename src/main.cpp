@@ -1,15 +1,21 @@
 //============================================================================
 // Name        : tesis-ardrone-server.cpp
-// Author      : 
+// Author      :
 // Version     :
-// Copyright   : 
+// Copyright   :
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
 #include <iostream>
+#include "server.hpp"
+
 using namespace std;
 
 int main() {
-	cout << "" << endl; // prints 
+
+	cout << "main";
+
+	server_main();
+
 	return 0;
 }

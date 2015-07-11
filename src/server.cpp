@@ -9,29 +9,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
+#include <iostream>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
+
+using namespace std;
 
 void server_main()
 {
-
-	int PORTNUM = 9090;
-
+	cout << endl << "SERVER MAIN START.." << endl;
 	int sockfd, newsockfd;
 	socklen_t clilen;
-	char buffer[256];
+	char buffer[BUFFER_SIZE];
 	struct sockaddr_in serv_addr, cli_addr;
-	int n;
 
 	// creo el socket
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (sockfd < 0)
 	{
-		printf("ERROR opening socket");
+		cout << "ERROR opening socket";
 		exit(EXIT_FAILURE);
 	}
 
@@ -41,7 +43,7 @@ void server_main()
 	// reasigno la direccion.
 	serv_addr.sin_family = AF_INET; // internet
 	serv_addr.sin_addr.s_addr = INADDR_ANY; // IP de la maquina
-	serv_addr.sin_port = htons(PORTNUM); // numero de puerto
+	serv_addr.sin_port = htons(PORT_NUMBER); // numero de puerto
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
@@ -49,37 +51,71 @@ void server_main()
 		exit(EXIT_FAILURE);
 	}
 
-	while (true)
+	// espero una conexion. El limite de espera es una conexion
+	listen(sockfd, 1);
+
+	clilen = sizeof(cli_addr);
+	newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+
+	if (newsockfd < 0)
 	{
-		listen(sockfd, 1);
+		printf("ERROR on accept %d", errno);
+		exit(EXIT_FAILURE);
+	}
 
-		clilen = sizeof(cli_addr);
-		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+	string message(buffer, BUFFER_SIZE);
 
-		if (newsockfd < 0)
+	while (message.compare("exit") != 0)
+	{
+		cout << "while" << endl;
+
+		// limpio el buffer
+		bzero(buffer, BUFFER_SIZE);
+
+		// leo lo que el cliente metio en el socket
+		if (read(newsockfd, buffer, BUFFER_SIZE) < 0)
 		{
-			printf("ERROR on accept %d", errno);
-			exit(EXIT_FAILURE);
+			cout << "ERROR reading socket";
+			break;
 		}
 
-		bzero(buffer, 256);
+		message.assign(buffer);
 
-		if (read(newsockfd, buffer, 255) < 0)
+		cout << message << endl;
+
+		// si en el mensaje hay un |, entonces tomo la primera parte como la accion y la segunda como el tiempo en MS.
+		if (message.find("|") != string::npos)
 		{
-			printf("ERROR reading from socket");
+			string action = message.substr(0, message.find("|"));
+			string time = message.substr(message.find("|"), message.length());
+
+			cout << "action: " << action << " time: " << time << endl;
+		}
+		// si no puedo encontrar el | es porque tiene que ser LAND o HOVER.
+		else
+		{
+			// el mensaje es LAND
+			if (message.compare("LAND") == 0)
+			{
+				cout << "land" << endl;
+			}
+			//  cualquier otra cosa la tomo como HOVER
+			else
+			{
+				cout << "hover" << endl;
+			}
 		}
 
-		printf("Here is the message: %s\n", buffer);
-
-		if (write(newsockfd, "I got your message", 18) < 0)
+		// devuelvo lo mismo que recibo.
+		if (write(newsockfd, buffer, BUFFER_SIZE) < 0)
 		{
-			printf("ERROR writing to socket");
+			cout << "ERROR writing the socket";
+			break;
 		}
 	}
-}
 
-close (newsockfd);
-close (sockfd);
+	close(newsockfd);
+	close(sockfd);
 
 }
 
