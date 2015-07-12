@@ -81,9 +81,8 @@ DEFINE_THREAD_ROUTINE(server, data)
 					message.length());
 
 			action = get_ardrone_action(action_msg);
-			time = atoi(time_msg.c_str());
-
-			if (time < 0) time = 0;
+			// esto va a convertir el numero hasta el primer char no convertible. Si no puede convertir nada, devuelve 0
+			time = strtol(time_msg.c_str(), NULL, 10);
 		}
 		else // si no puedo encontrar el | es porque tiene que ser LAND o HOVER.
 		{
