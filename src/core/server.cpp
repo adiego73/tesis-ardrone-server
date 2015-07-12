@@ -5,8 +5,13 @@
  *      Author: diego
  */
 
+#ifndef __cplusplus
+#define __cplusplus
+#endif
+
 // file include
 #include <core/server.hpp>
+#include "structures.hpp"
 
 // system includes
 #include <iostream>
@@ -23,16 +28,17 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-extern "C" {
-// ardrone includes
-#include <vp_os_thread.h>
-
-}
-using namespace std;
-
 DEFINE_THREAD_ROUTINE(server, data)
 {
-	cout << endl << "SERVER MAIN START.." << endl;
+	if (data == NULL)
+	{
+		std::cout << "DATA cannot be NULL" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	thread_data* param = (thread_data*) data;
+
+	std::cout << std::endl << "SERVER MAIN START.." << std::endl;
 	int sockfd, newsockfd;
 	socklen_t clilen;
 	char buffer[BUFFER_SIZE];
@@ -43,7 +49,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	if (sockfd < 0)
 	{
-		cout << "ERROR opening socket";
+		std::cout << "ERROR opening socket";
 		exit(EXIT_FAILURE);
 	}
 
@@ -57,7 +63,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		printf("ERROR on binding %d", errno);
+		std::cout << "ERROR on binding " << errno << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -69,37 +75,36 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	if (newsockfd < 0)
 	{
-		printf("ERROR on accept %d", errno);
+		std::cout << "ERROR on accept " << errno << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
-	string message(buffer, BUFFER_SIZE);
+	std::string message(buffer, BUFFER_SIZE);
 
 	while (message.compare("exit") != 0)
 	{
-		cout << "while" << endl;
-
 		// limpio el buffer
 		bzero(buffer, BUFFER_SIZE);
 
 		// leo lo que el cliente metio en el socket
 		if (read(newsockfd, buffer, BUFFER_SIZE) < 0)
 		{
-			cout << "ERROR reading socket";
+			std::cout << "ERROR reading socket" << errno << std::endl;
 			break;
 		}
 
 		message.assign(buffer);
 
-		cout << message << endl;
+		std::cout << "DEBUG: " << message << std::endl;
+
+		std::string action;
+		std::string time;
 
 		// si en el mensaje hay un |, entonces tomo la primera parte como la accion y la segunda como el tiempo en MS.
-		if (message.find("|") != string::npos)
+		if (message.find("|") != std::string::npos)
 		{
-			string action = message.substr(0, message.find("|"));
-			string time = message.substr(message.find("|"), message.length());
-
-			cout << "action: " << action << " time: " << time << endl;
+			action = message.substr(0, message.find("|"));
+			time = message.substr(message.find("|"), message.length());
 		}
 		// si no puedo encontrar el | es porque tiene que ser LAND o HOVER.
 		else
@@ -107,19 +112,30 @@ DEFINE_THREAD_ROUTINE(server, data)
 			// el mensaje es LAND
 			if (message.compare("LAND") == 0)
 			{
-				cout << "land" << endl;
+				action = "LAND";
+				time = "0";
 			}
 			//  cualquier otra cosa la tomo como HOVER
 			else
 			{
-				cout << "hover" << endl;
+				action = "HOVER";
+				time = "0";
 			}
 		}
+
+		std::cout << "DEBUG: " << "action -> " << action << " time -> " << time << std::endl;
+
+		vp_os_mutex_lock(&param->mutex);
+
+		param->action = action;
+		param->ms_time = atoi(time.c_str());;
+
+		vp_os_mutex_unlock(&param->mutex);
 
 		// devuelvo lo mismo que recibo.
 		if (write(newsockfd, buffer, BUFFER_SIZE) < 0)
 		{
-			cout << "ERROR writing the socket";
+			std::cout << "ERROR writing the socket: " << errno << std::endl;
 			break;
 		}
 	}

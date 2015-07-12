@@ -4,6 +4,9 @@
  *  Created on: Jul 12, 2015
  *      Author: diego
  */
+#ifndef __cplusplus
+#define __cplusplus
+#endif
 
 #ifndef STRUCTURES_HPP_
 #define STRUCTURES_HPP_

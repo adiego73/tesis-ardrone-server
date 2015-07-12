@@ -6,15 +6,25 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
+#ifndef __cplusplus
+#define __cplusplus
+#endif
+
 // system includes
 #include <iostream>
 
+extern "C"{
 // ardrone includes
 #include <ardrone_tool/ardrone_tool.h>
 #include <VP_Api/vp_api_thread_helper.h>
 
+}
+
 // proj includes
+#include "core/server.hpp"
+#include "core/ardrone.hpp"
 #include "structures.hpp"
+
 
 using namespace std;
 
@@ -25,8 +35,11 @@ int main(int argc, char** argv)
 
 C_RESULT ardrone_tool_init_custom(void)
 {
-	START_THREAD(server, NULL);
-	START_THREAD(ardrone_control, NULL);
+	thread_data data;
+	vp_os_mutex_init(&data.mutex);
+
+	START_THREAD(server, &data);
+	START_THREAD(ardrone_control, &data);
 
 	return C_OK;
 }
