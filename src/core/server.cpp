@@ -5,23 +5,32 @@
  *      Author: diego
  */
 
-#include <server.hpp>
+// file include
+#include <core/server.hpp>
 
+// system includes
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <string>
-#include <iostream>
+#include <strings.h>
 #include <unistd.h>
+
+// system net includes
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+extern "C" {
+// ardrone includes
+#include <vp_os_thread.h>
+
+}
 using namespace std;
 
-void server_main()
+DEFINE_THREAD_ROUTINE(server, data)
 {
 	cout << endl << "SERVER MAIN START.." << endl;
 	int sockfd, newsockfd;
@@ -118,5 +127,6 @@ void server_main()
 	close(newsockfd);
 	close(sockfd);
 
+	return C_OK;
 }
 
