@@ -1,25 +1,5 @@
-#include <ardrone_tool/UI/ardrone_input.h>
-#include <vp_os_signal.h>
-#include <vp_os_thread.h>
-#include <vp_os_types.h>
-
-/*
- * ardrone.cpp
- *
- *  Created on: Jul 11, 2015
- *      Author: diego
- */
-#ifndef __cplusplus
-#define __cplusplus
-#endif
-
-//system includes
-#include <iostream>
-#include <stdlib.h>
-
-// file include
 #include "core/ardrone.hpp"
-#include "structures.hpp"
+
 
 DEFINE_THREAD_ROUTINE(ardrone_control, data)
 {

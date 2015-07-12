@@ -1,34 +1,17 @@
-//============================================================================
-// Name        : tesis-ardrone-server.cpp
-// Author      :
-// Version     :
-// Copyright   :
-// Description : Hello World in C++, Ansi-style
-//============================================================================
+#include <iostream>
 
+extern "C" {
+	#include <ardrone_tool/ardrone_tool.h>
+}
+
+#include <VP_Api/vp_api_thread_helper.h>
 #include <ardrone_api.h>
 #include <vp_os_signal.h>
 #include <vp_os_types.h>
 
-#ifndef __cplusplus
-#define __cplusplus
-#endif
-
-// system includes
-#include <iostream>
-
-extern "C"{
-// ardrone includes
-#include <ardrone_tool/ardrone_tool.h>
-#include <VP_Api/vp_api_thread_helper.h>
-
-}
-
-// proj includes
 #include "core/server.hpp"
 #include "core/ardrone.hpp"
 #include "structures.hpp"
-
 
 using namespace std;
 

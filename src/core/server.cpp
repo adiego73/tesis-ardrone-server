@@ -1,35 +1,5 @@
-/*
- * server.cpp
- *
- *  Created on: Jul 11, 2015
- *      Author: diego
- */
-
-#include <vp_os_signal.h>
-#include <vp_os_thread.h>
-#include <vp_os_types.h>
-
-#ifndef __cplusplus
-#define __cplusplus
-#endif
-
 // file include
 #include <core/server.hpp>
-
-// system includes
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <strings.h>
-#include <unistd.h>
-
-// system net includes
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 DEFINE_THREAD_ROUTINE(server, data)
 {
