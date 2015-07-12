@@ -6,6 +6,10 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
+#include <ardrone_api.h>
+#include <vp_os_signal.h>
+#include <vp_os_types.h>
+
 #ifndef __cplusplus
 #define __cplusplus
 #endif
@@ -37,6 +41,8 @@ C_RESULT ardrone_tool_init_custom(void)
 {
 	thread_data data;
 	vp_os_mutex_init(&data.mutex);
+
+	ardrone_at_set_flat_trim();
 
 	START_THREAD(server, &data);
 	START_THREAD(ardrone_control, &data);

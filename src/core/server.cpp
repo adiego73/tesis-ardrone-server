@@ -5,13 +5,16 @@
  *      Author: diego
  */
 
+#include <vp_os_signal.h>
+#include <vp_os_thread.h>
+#include <vp_os_types.h>
+
 #ifndef __cplusplus
 #define __cplusplus
 #endif
 
 // file include
 #include <core/server.hpp>
-#include "structures.hpp"
 
 // system includes
 #include <iostream>
@@ -97,38 +100,34 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 		std::cout << "DEBUG: " << message << std::endl;
 
-		std::string action;
-		std::string time;
+		ardrone_action action;
+		int time;
 
 		// si en el mensaje hay un |, entonces tomo la primera parte como la accion y la segunda como el tiempo en MS.
 		if (message.find("|") != std::string::npos)
 		{
-			action = message.substr(0, message.find("|"));
-			time = message.substr(message.find("|"), message.length());
+			std::string action_msg = message.substr(0, message.find("|"));
+			std::string time_msg = message.substr(message.find("|"),
+					message.length());
+
+			action = get_ardrone_action(action_msg);
+			time = atoi(time_msg.c_str());
+
+			if (time < 0) time = 0;
 		}
-		// si no puedo encontrar el | es porque tiene que ser LAND o HOVER.
-		else
+		else // si no puedo encontrar el | es porque tiene que ser LAND o HOVER.
 		{
-			// el mensaje es LAND
-			if (message.compare("LAND") == 0)
-			{
-				action = "LAND";
-				time = "0";
-			}
-			//  cualquier otra cosa la tomo como HOVER
-			else
-			{
-				action = "HOVER";
-				time = "0";
-			}
+			action = get_ardrone_action(message);
+			time = 0;
 		}
 
-		std::cout << "DEBUG: " << "action -> " << action << " time -> " << time << std::endl;
+		std::cout << "DEBUG: " << "action -> " << action << " time -> " << time
+				<< std::endl;
 
 		vp_os_mutex_lock(&param->mutex);
 
 		param->action = action;
-		param->ms_time = atoi(time.c_str());;
+		param->ms_time = time;
 
 		vp_os_mutex_unlock(&param->mutex);
 
@@ -144,5 +143,18 @@ DEFINE_THREAD_ROUTINE(server, data)
 	close(sockfd);
 
 	return C_OK;
+}
+
+ardrone_action get_ardrone_action(std::string action_str)
+{
+	if (action_str.compare("RIGHT")) return RIGHT;
+	if (action_str.compare("LEFT")) return LEFT;
+	if (action_str.compare("FORWARD")) return FORWARD;
+	if (action_str.compare("BACKWARD")) return BACKWARD;
+	if (action_str.compare("UP")) return UP;
+	if (action_str.compare("DOWN")) return DOWN;
+	if (action_str.compare("LAND")) return LAND;
+	if (action_str.compare("TAKEOFF")) return TAKEOFF;
+	else return HOVER;
 }
 

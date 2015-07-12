@@ -11,7 +11,10 @@
 extern "C"
 {
 // ardrone includes
+#include <ardrone_tool/UI/ardrone_input.h>
+#include <vp_os_thread.h>
 #include <VP_Api/vp_api_thread_helper.h>
+#include <vp_os_signal.h>
 
 }
 

@@ -1,3 +1,5 @@
+#include <vp_os_signal_dep.h>
+
 /*
  * structures.hpp
  *
@@ -14,11 +16,16 @@
 #include <vp_os_signal.h>
 #include <string>
 
+typedef enum
+{
+	RIGHT, LEFT, FORWARD, BACKWARD, UP, DOWN, LAND, HOVER, TAKEOFF
+} ardrone_action;
+
 struct thread_data
 {
 		vp_os_mutex_t mutex;
-		std::string action;
-		int ms_time;
+		ardrone_action action;
+		unsigned int ms_time;
 };
 
 #endif /* STRUCTURES_HPP_ */
