@@ -10,7 +10,6 @@ extern "C"
 	#include <ardrone_tool/UI/ardrone_input.h>
 }
 
-#include <vp_os_thread.h>
 #include <vp_os_signal.h>
 #include <vp_os_thread.h>
 

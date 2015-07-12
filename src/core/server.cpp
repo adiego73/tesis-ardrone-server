@@ -54,7 +54,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	std::string message(buffer, BUFFER_SIZE);
 
-	while (message.compare("exit") != 0)
+	while (message.compare("TAKEOFF") != 0)
 	{
 		// limpio el buffer
 		bzero(buffer, BUFFER_SIZE);
