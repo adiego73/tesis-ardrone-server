@@ -11,9 +11,7 @@
 
 using namespace std;
 
-int main() {
-
-	cout << "main";
+int main(int argc, char** argv) {
 
 	server_main();
 
