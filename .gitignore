@@ -27,3 +27,6 @@
 *.out
 *.app
 /Debug/
+/Release/
+/debug-main/
+/debug-test-client/
