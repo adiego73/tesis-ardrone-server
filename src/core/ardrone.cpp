@@ -47,9 +47,9 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 					ardrone_tool_set_progressive_cmd(false, 0, 0, -0.01, 0, 0,
 							0);
 				break;
-				default:
-					ardrone_tool_set_progressive_cmd(false, 0, 0, 0, 0, 0, 0);
-				break;
+//				default:
+//					ardrone_tool_set_progressive_cmd(false, 0, 0, 0, 0, 0, 0);
+//				break;
 			}
 
 			clock_gettime(CLOCK_MONOTONIC, &time_end);
@@ -66,7 +66,7 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 			ardrone_tool_set_ui_pad_start(1);
 			exit = true;
 		}
-		else // hover
+		else //si no sabe que hacer, le manda hover
 		{
 			ardrone_tool_set_progressive_cmd(false, 0, 0, 0, 0, 0, 0);
 		}

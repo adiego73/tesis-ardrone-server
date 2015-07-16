@@ -60,9 +60,15 @@ DEFINE_THREAD_ROUTINE(server, data)
 		bzero(buffer, BUFFER_SIZE);
 
 		// leo lo que el cliente metio en el socket
-		if (read(newsockfd, buffer, BUFFER_SIZE) < 0)
+		int request_size = read(newsockfd, buffer, BUFFER_SIZE);
+		if (request_size < 0)
 		{
 			std::cout << "ERROR reading socket" << errno << std::endl;
+			break;
+		}
+		else if (request_size == 0)
+		{
+			std::cout << "Client disconnected" << std::endl;
 			break;
 		}
 
