@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 {
 	int sockfd;
 	struct sockaddr_in serv_addr;
-	extern struct hostent *server;
+	struct hostent *server;
 
 	char buffer[BUFFER_SIZE];
 
