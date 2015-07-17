@@ -48,6 +48,8 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 					ardrone_tool_set_progressive_cmd(false, 0, 0, -0.01, 0, 0,
 							0);
 				break;
+				default:
+				break;
 			}
 
 			clock_gettime(CLOCK_MONOTONIC, &time_end);

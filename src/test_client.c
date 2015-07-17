@@ -1,7 +1,5 @@
-#include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -35,8 +33,7 @@ int main(int argc, char *argv[])
 
 	if (sockfd < 0)
 	{
-		std::cout << "ERROR on creating socket. Error No: " << errno
-				<< std::endl;
+		printf("ERROR on creating socket. Error No: %d \n", errno);
 		exit(EXIT_FAILURE);
 	}
 
@@ -44,8 +41,7 @@ int main(int argc, char *argv[])
 
 	if (server == NULL)
 	{
-		std::cout << "ERROR there is no host called '" << HOST_NAME
-				<< "'. Error No: " << errno << std::endl;
+		printf("ERROR there is no host called '%s'. Error No: %d \n", HOST_NAME, errno);
 		exit(EXIT_FAILURE);
 	}
 
@@ -57,24 +53,18 @@ int main(int argc, char *argv[])
 
 	if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		std::cout << "ERROR connecting to socket. Error No: " << errno
-				<< std::endl;
+		printf("ERROR connecting to socket. Error No: %d \n", errno);
 		exit(EXIT_FAILURE);
 	}
 
-	std::string message = "";
-
 	do
 	{
-		std::cout << "MESSAGE: ";
-		std::cin >> buffer;
-
-		message.assign(buffer);
+		printf("MESSAGE: ");
+		fgets(buffer, BUFFER_SIZE, stdin);
 
 		if (write(sockfd, buffer, BUFFER_SIZE))
 		{
-			std::cout << "ERROR writing to socket. Error No: " << errno
-					<< std::endl;
+			printf("ERROR writing to socket. Error No: %d \n", errno);
 			break;
 		}
 
@@ -82,14 +72,13 @@ int main(int argc, char *argv[])
 
 		if (read(sockfd, buffer, BUFFER_SIZE) < 0)
 		{
-			std::cout << "ERROR reading from socket. Error No: " << errno
-					<< std::endl;
+			printf("ERROR reading from socket. Error No: %d \n",errno);
 			break;
 		}
 
-		std::cout << "SERVER RESPONSE: " << buffer << std::endl;
+		printf("SERVER RESPONSE: %d \n", buffer);
 
-	} while (message.compare("LAND") != 0);
+	} while (strcmp(buffer, "LAND") != 0);
 
 	close(sockfd);
 	return 0;

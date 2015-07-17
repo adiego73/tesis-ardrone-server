@@ -61,6 +61,8 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 		// leo lo que el cliente metio en el socket
 		int request_size = read(newsockfd, buffer, BUFFER_SIZE);
+
+		// request_size representa el total de bytes leidos
 		if (request_size < 0)
 		{
 			std::cout << "ERROR reading socket" << errno << std::endl;
@@ -69,10 +71,15 @@ DEFINE_THREAD_ROUTINE(server, data)
 		else if (request_size == 0) // si el size del request es 0, es porque no hay un cliente conectado.
 		{
 			std::cout << "Client disconnected" << std::endl;
-			break;
+			// mando el mensaje LAND
+			message = "LAND";
 		}
-
-		message.assign(buffer);
+		else
+		{
+			// mando cualquier otro mensaje
+			// message va a ser igual al contenido de lo que leo en el socket
+			message.assign(buffer, request_size);
+		}
 
 		std::cout << "SENT MESSAGE: " << message << std::endl;
 
@@ -90,7 +97,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 			// esto va a convertir el numero hasta el primer char no convertible. Si no puede convertir nada, devuelve 0
 			time = strtol(time_msg.c_str(), NULL, 10);
 		}
-		else // si no puedo encontrar el | es porque tiene que ser LAND o HOVER.
+		else // si no puedo encontrar el | es porque tiene que ser LAND, TAKEOFF o HOVER.
 		{
 			action = get_ardrone_action(message);
 			time = 0;
@@ -107,7 +114,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 		vp_os_mutex_unlock(&param->mutex);
 
 		// devuelvo lo mismo que recibo.
-		if (write(newsockfd, buffer, BUFFER_SIZE) < 0)
+		if (write(newsockfd, message.c_str(), message.length()) < 0)
 		{
 			std::cout << "ERROR writing the socket: " << errno << std::endl;
 			break;
