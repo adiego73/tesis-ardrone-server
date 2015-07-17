@@ -54,7 +54,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	std::string message(buffer, BUFFER_SIZE);
 
-	while (message.compare("TAKEOFF") != 0)
+	while (message.compare("LAND") != 0)
 	{
 		// limpio el buffer
 		bzero(buffer, BUFFER_SIZE);
@@ -66,7 +66,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 			std::cout << "ERROR reading socket" << errno << std::endl;
 			break;
 		}
-		else if (request_size == 0)
+		else if (request_size == 0) // si el size del request es 0, es porque no hay un cliente conectado.
 		{
 			std::cout << "Client disconnected" << std::endl;
 			break;
@@ -74,7 +74,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 		message.assign(buffer);
 
-		std::cout << "DEBUG: " << message << std::endl;
+		std::cout << "SENT MESSAGE: " << message << std::endl;
 
 		ardrone_action action;
 		int time;

@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 
 		std::cout << "SERVER RESPONSE: " << buffer << std::endl;
 
-	} while (message.compare("TAKEOFF") != 0);
+	} while (message.compare("LAND") != 0);
 
 	close(sockfd);
 	return 0;

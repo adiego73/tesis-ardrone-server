@@ -21,6 +21,7 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 
 		clock_gettime(CLOCK_MONOTONIC, &time_start);
 
+		// si time_left es 0, no va a entrar aca.
 		while (time_diff < time_left)
 		{
 			switch (param->action)
@@ -47,23 +48,20 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 					ardrone_tool_set_progressive_cmd(false, 0, 0, -0.01, 0, 0,
 							0);
 				break;
-//				default:
-//					ardrone_tool_set_progressive_cmd(false, 0, 0, 0, 0, 0, 0);
-//				break;
 			}
 
 			clock_gettime(CLOCK_MONOTONIC, &time_end);
 			time_diff = time_end.tv_sec - time_start.tv_sec;
 		}
 
-		if (param->action == LAND)
+		if (param->action == TAKEOFF) // despegue
+		{
+			ardrone_tool_set_ui_pad_select(0);
+			ardrone_tool_set_ui_pad_start(1);
+		}
+		else if (param->action == LAND) // aterrizaje
 		{
 			ardrone_tool_set_ui_pad_start(0);
-		}
-		else if (param->action == TAKEOFF)
-		{
-			ardrone_tool_set_ui_pad_select(1);
-			ardrone_tool_set_ui_pad_start(1);
 			exit = true;
 		}
 		else //si no sabe que hacer, le manda hover
@@ -73,10 +71,13 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 
 		time_diff = 0.0f;
 
+		// pasamos a HOVER para que no se quede repitiendo siempre lo mismo en caso de que no se mande mas nada.
+		param->action = HOVER;
+		param->ms_time = 0;
+
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
 		vp_os_mutex_unlock(&param->mutex);
 	}
-
 	return C_OK;
 }
 
