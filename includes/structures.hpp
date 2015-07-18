@@ -17,4 +17,8 @@ struct thread_data
 		unsigned int ms_time;
 };
 
+#ifndef __DEBUG__
+//#define __DEBUG__
+#endif
+
 #endif /* STRUCTURES_HPP_ */

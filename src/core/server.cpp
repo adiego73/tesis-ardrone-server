@@ -11,6 +11,8 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	thread_data* param = (thread_data*) data;
 
+	vp_os_mutex_unlock(&param->mutex);
+
 	std::cout << std::endl << "SERVER MAIN START.." << std::endl;
 	int sockfd, newsockfd;
 	socklen_t clilen;
@@ -81,8 +83,6 @@ DEFINE_THREAD_ROUTINE(server, data)
 			message.assign(buffer, request_size);
 		}
 
-		std::cout << "SENT MESSAGE: " << message << std::endl;
-
 		ardrone_action action;
 		int time;
 
@@ -93,6 +93,9 @@ DEFINE_THREAD_ROUTINE(server, data)
 			std::string time_msg = message.substr(message.find("|"),
 					message.length());
 
+			std::cout << "action msg: " << action_msg << std::endl;
+			std::cout << "time msg" << time_msg << std::endl;
+
 			action = get_ardrone_action(action_msg);
 			// esto va a convertir el numero hasta el primer char no convertible. Si no puede convertir nada, devuelve 0
 			time = strtol(time_msg.c_str(), NULL, 10);
@@ -102,9 +105,6 @@ DEFINE_THREAD_ROUTINE(server, data)
 			action = get_ardrone_action(message);
 			time = 0;
 		}
-
-		std::cout << "DEBUG: " << "action -> " << action << " time -> " << time
-				<< std::endl;
 
 		vp_os_mutex_lock(&param->mutex);
 

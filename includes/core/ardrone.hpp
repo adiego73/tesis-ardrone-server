@@ -17,6 +17,6 @@ extern "C"
 
 #include "structures.hpp"
 
-PROTO_THREAD_ROUTINE(ardrone_control, data);
+PROTO_THREAD_ROUTINE(drone_control, data);
 
 #endif /* ARDRONE_HPP_ */

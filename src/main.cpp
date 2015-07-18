@@ -30,13 +30,16 @@ int main(int argc, char** argv)
  */
 C_RESULT ardrone_tool_init_custom(void)
 {
-	thread_data data;
-	vp_os_mutex_init(&data.mutex);
+	thread_data * data = (thread_data *) vp_os_calloc(1, sizeof(thread_data));
+
+	vp_os_mutex_init(&data->mutex);
+	// bloqueo el mutex para que entre primero en el server
+	vp_os_mutex_lock(&data->mutex);
 
 	ardrone_at_set_flat_trim();
 
-	START_THREAD(server, &data);
-	START_THREAD(ardrone_control, &data);
+	START_THREAD(server, data);
+	START_THREAD(drone_control, data);
 
 	return C_OK;
 }
@@ -44,7 +47,7 @@ C_RESULT ardrone_tool_init_custom(void)
 C_RESULT ardrone_tool_shutdown_custom(void)
 {
 	JOIN_THREAD(server);
-	JOIN_THREAD(ardrone_control);
+	JOIN_THREAD(drone_control);
 
 	return C_OK;
 }
@@ -60,15 +63,16 @@ C_RESULT navdata_init(void)
 
 C_RESULT navdata_process(const navdata_unpacked_t* const data)
 {
+#ifdef __DEBUG__
 	cout << "============================================" << endl;
 	cout << "==============   NAVDATA INFO   ============" << endl;
 	cout << "============================================" << endl;
-	cout << "\t " << "Altitude: " << &data->navdata_demo.altitude << endl;
-	cout << "\t " << "Roll: " << &data->navdata_demo.phi << endl;
-	cout << "\t " << "Pitch: " << &data->navdata_demo.theta << endl;
-	cout << "\t " << "Yaw: " << &data->navdata_demo.psi << endl;
-	cout << "\t " << "State: " << &data->navdata_demo.ctrl_state << endl;
-
+	cout << "\t " << "Altitude: " << data->navdata_demo.altitude << endl;
+	cout << "\t " << "Roll: " << data->navdata_demo.phi << endl;
+	cout << "\t " << "Pitch: " << data->navdata_demo.theta << endl;
+	cout << "\t " << "Yaw: " << data->navdata_demo.psi << endl;
+	cout << "\t " << "State: " << data->navdata_demo.ctrl_state << endl;
+#endif
 	return C_OK;
 }
 
@@ -93,13 +97,10 @@ std::string get_state_string(uint32_t state)
  * Tables
  */
 
-BEGIN_THREAD_TABLE
-	THREAD_TABLE_ENTRY(server, 20)
-	THREAD_TABLE_ENTRY(ardrone_control, 20)
-	THREAD_TABLE_ENTRY(navdata_update, 20 )
-	THREAD_TABLE_ENTRY(ardrone_control, 20 )
+BEGIN_THREAD_TABLE THREAD_TABLE_ENTRY(server, 20)
+THREAD_TABLE_ENTRY(drone_control, 20)
+THREAD_TABLE_ENTRY(navdata_update, 20 )
 END_THREAD_TABLE
 
-BEGIN_NAVDATA_HANDLER_TABLE
-	NAVDATA_HANDLER_TABLE_ENTRY(navdata_init, navdata_process, navdata_release, NULL)
+BEGIN_NAVDATA_HANDLER_TABLE NAVDATA_HANDLER_TABLE_ENTRY(navdata_init, navdata_process, navdata_release, NULL)
 END_NAVDATA_HANDLER_TABLE

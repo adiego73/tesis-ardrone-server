@@ -1,6 +1,6 @@
 #include "core/ardrone.hpp"
 
-DEFINE_THREAD_ROUTINE(ardrone_control, data)
+DEFINE_THREAD_ROUTINE(drone_control, data)
 {
 	if (data == NULL)
 	{
@@ -9,6 +9,7 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 	}
 
 	thread_data* param = (thread_data*) data;
+
 	bool exit = false;
 	timespec time_start, time_end;
 	float time_diff = 0.0f;
@@ -56,8 +57,11 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 			time_diff = time_end.tv_sec - time_start.tv_sec;
 		}
 
+		std::cout << "action: "<<param->action << std::endl;
+
 		if (param->action == TAKEOFF) // despegue
 		{
+			std::cout << "takeoff "<< std::endl;
 			ardrone_tool_set_ui_pad_select(0);
 			ardrone_tool_set_ui_pad_start(1);
 		}
@@ -74,8 +78,8 @@ DEFINE_THREAD_ROUTINE(ardrone_control, data)
 		time_diff = 0.0f;
 
 		// pasamos a HOVER para que no se quede repitiendo siempre lo mismo en caso de que no se mande mas nada.
-		param->action = HOVER;
-		param->ms_time = 0;
+		//param->action = HOVER;
+		//param->ms_time = 0;
 
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
 		vp_os_mutex_unlock(&param->mutex);

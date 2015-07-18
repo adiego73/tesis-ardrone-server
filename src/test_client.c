@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
 
-	char buffer[BUFFER_SIZE];
+//	char buffer[BUFFER_SIZE];
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
 
 	if (server == NULL)
 	{
-		printf("ERROR there is no host called '%s'. Error No: %d \n", HOST_NAME, errno);
+		printf("ERROR there is no host called '%s'. Error No: %d \n", HOST_NAME,
+				errno);
 		exit(EXIT_FAILURE);
 	}
 
@@ -56,13 +57,13 @@ int main(int argc, char *argv[])
 		printf("ERROR connecting to socket. Error No: %d \n", errno);
 		exit(EXIT_FAILURE);
 	}
+	char buffer[BUFFER_SIZE] = "TAKEOFF";
 
 	do
 	{
-		printf("MESSAGE: ");
-		fgets(buffer, BUFFER_SIZE, stdin);
+		//fgets(buffer, BUFFER_SIZE, stdin);
 
-		if (write(sockfd, buffer, BUFFER_SIZE))
+		if (write(sockfd, buffer, BUFFER_SIZE) < 0)
 		{
 			printf("ERROR writing to socket. Error No: %d \n", errno);
 			break;
@@ -72,11 +73,9 @@ int main(int argc, char *argv[])
 
 		if (read(sockfd, buffer, BUFFER_SIZE) < 0)
 		{
-			printf("ERROR reading from socket. Error No: %d \n",errno);
+			printf("ERROR reading from socket. Error No: %d \n", errno);
 			break;
 		}
-
-		printf("SERVER RESPONSE: %d \n", buffer);
 
 	} while (strcmp(buffer, "LAND") != 0);
 
