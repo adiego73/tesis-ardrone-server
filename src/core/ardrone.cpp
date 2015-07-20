@@ -51,6 +51,7 @@ DEFINE_THREAD_ROUTINE(drone_control, data)
 							0);
 				break;
 				default:
+					// do nothing
 				break;
 			}
 

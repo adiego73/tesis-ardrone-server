@@ -1,4 +1,3 @@
-// file include
 #include <core/server.hpp>
 
 DEFINE_THREAD_ROUTINE(server, data)
@@ -11,9 +10,10 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	thread_data* param = (thread_data*) data;
 
-	vp_os_mutex_unlock(&param->mutex);
+//	vp_os_mutex_unlock(&param->mutex);
 
 	std::cout << std::endl << "SERVER MAIN START.." << std::endl;
+
 	int sockfd, newsockfd;
 	socklen_t clilen;
 	char buffer[BUFFER_SIZE];
@@ -68,7 +68,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 		if (request_size < 0)
 		{
 			std::cout << "ERROR reading socket" << errno << std::endl;
-			break;
+			message = "LAND";
 		}
 		else if (request_size == 0) // si el size del request es 0, es porque no hay un cliente conectado.
 		{
@@ -79,7 +79,6 @@ DEFINE_THREAD_ROUTINE(server, data)
 		else
 		{
 			// mando cualquier otro mensaje
-			// message va a ser igual al contenido de lo que leo en el socket
 			message.assign(buffer, request_size);
 		}
 
@@ -89,18 +88,15 @@ DEFINE_THREAD_ROUTINE(server, data)
 		// si en el mensaje hay un |, entonces tomo la primera parte como la accion y la segunda como el tiempo en MS.
 		if (message.find("|") != std::string::npos)
 		{
-			std::cout << message << std::endl;
+			int pipe_pos = message.find("|");
 
-			std::string action_msg = message.substr(0, message.find("|"));
-			std::string time_msg = message.substr(message.find("|") + 1,
+			std::string action_msg = message.substr(0, pipe_pos);
+			std::string time_msg = message.substr(pipe_pos + 1,
 					message.length());
 
 			action = get_ardrone_action(action_msg);
 			// esto va a convertir el numero hasta el primer char no convertible. Si no puede convertir nada, devuelve 0
 			time = strtol(time_msg.c_str(), NULL, 10);
-
-			std::cout << " \t action" << action_msg << "  -------- " << time_msg << std::endl;
-
 		}
 		else // si no puedo encontrar el | es porque tiene que ser LAND, TAKEOFF o HOVER.
 		{
@@ -115,15 +111,13 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 		vp_os_mutex_unlock(&param->mutex);
 
-		// devuelvo lo mismo que recibo.
+		// devuelvo lo mismo que recibo. Si hay un error informo, y sigo.
 		if (write(newsockfd, message.c_str(), message.length()) < 0)
 		{
 			std::cout << "ERROR writing the socket: " << errno << std::endl;
-			break;
 		}
 	}
 
-	std::cout << "fin" << std::endl;
 	close(newsockfd);
 	close(sockfd);
 

@@ -2,8 +2,8 @@
 
 extern "C"
 {
-#include <ardrone_tool/ardrone_tool.h>
-#include <ardrone_tool/Navdata/ardrone_navdata_client.h>
+	#include <ardrone_tool/ardrone_tool.h>
+	#include <ardrone_tool/Navdata/ardrone_navdata_client.h>
 }
 
 #include <VP_Api/vp_api_thread_helper.h>
@@ -18,7 +18,7 @@ extern "C"
 
 using namespace std;
 
-std::string get_state_string(uint32_t state);
+std::string get_state_as_string(uint32_t state);
 
 int main(int argc, char** argv)
 {
@@ -34,7 +34,7 @@ C_RESULT ardrone_tool_init_custom(void)
 
 	vp_os_mutex_init(&data->mutex);
 	// bloqueo el mutex para que entre primero en el server
-	vp_os_mutex_lock(&data->mutex);
+	//vp_os_mutex_lock(&data->mutex);
 
 	ardrone_at_set_flat_trim();
 
@@ -81,7 +81,7 @@ C_RESULT navdata_release(void)
 	return C_OK;
 }
 
-std::string get_state_string(uint32_t state)
+std::string get_state_as_string(uint32_t state)
 {
 	if (state == 131072) return "Landed";
 	if (state == 393216) return "Taking-off-Floor";
@@ -97,10 +97,12 @@ std::string get_state_string(uint32_t state)
  * Tables
  */
 
-BEGIN_THREAD_TABLE THREAD_TABLE_ENTRY(server, 20)
-THREAD_TABLE_ENTRY(drone_control, 20)
-THREAD_TABLE_ENTRY(navdata_update, 20 )
+BEGIN_THREAD_TABLE
+	THREAD_TABLE_ENTRY(server, 20)
+	THREAD_TABLE_ENTRY(drone_control, 20)
+	THREAD_TABLE_ENTRY(navdata_update, 20 )
 END_THREAD_TABLE
 
-BEGIN_NAVDATA_HANDLER_TABLE NAVDATA_HANDLER_TABLE_ENTRY(navdata_init, navdata_process, navdata_release, NULL)
+BEGIN_NAVDATA_HANDLER_TABLE
+	NAVDATA_HANDLER_TABLE_ENTRY(navdata_init, navdata_process, navdata_release, NULL)
 END_NAVDATA_HANDLER_TABLE
