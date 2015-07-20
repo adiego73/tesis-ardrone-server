@@ -89,16 +89,18 @@ DEFINE_THREAD_ROUTINE(server, data)
 		// si en el mensaje hay un |, entonces tomo la primera parte como la accion y la segunda como el tiempo en MS.
 		if (message.find("|") != std::string::npos)
 		{
-			std::string action_msg = message.substr(0, message.find("|"));
-			std::string time_msg = message.substr(message.find("|"),
-					message.length());
+			std::cout << message << std::endl;
 
-			std::cout << "action msg: " << action_msg << std::endl;
-			std::cout << "time msg" << time_msg << std::endl;
+			std::string action_msg = message.substr(0, message.find("|"));
+			std::string time_msg = message.substr(message.find("|") + 1,
+					message.length());
 
 			action = get_ardrone_action(action_msg);
 			// esto va a convertir el numero hasta el primer char no convertible. Si no puede convertir nada, devuelve 0
 			time = strtol(time_msg.c_str(), NULL, 10);
+
+			std::cout << " \t action" << action_msg << "  -------- " << time_msg << std::endl;
+
 		}
 		else // si no puedo encontrar el | es porque tiene que ser LAND, TAKEOFF o HOVER.
 		{
@@ -121,6 +123,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 		}
 	}
 
+	std::cout << "fin" << std::endl;
 	close(newsockfd);
 	close(sockfd);
 
@@ -129,14 +132,14 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 ardrone_action get_ardrone_action(std::string action_str)
 {
-	if (action_str.compare("RIGHT")) return RIGHT;
-	if (action_str.compare("LEFT")) return LEFT;
-	if (action_str.compare("FORWARD")) return FORWARD;
-	if (action_str.compare("BACKWARD")) return BACKWARD;
-	if (action_str.compare("UP")) return UP;
-	if (action_str.compare("DOWN")) return DOWN;
-	if (action_str.compare("LAND")) return LAND;
-	if (action_str.compare("TAKEOFF")) return TAKEOFF;
+	if (action_str.find("RIGHT") != std::string::npos) return RIGHT;
+	else if (action_str.find("LEFT") != std::string::npos) return LEFT;
+	else if (action_str.find("FORWARD") != std::string::npos) return FORWARD;
+	else if (action_str.find("BACKWARD") != std::string::npos) return BACKWARD;
+	else if (action_str.find("UP") != std::string::npos) return UP;
+	else if (action_str.find("DOWN") != std::string::npos) return DOWN;
+	else if (action_str.find("LAND") != std::string::npos) return LAND;
+	else if (action_str.find("TAKEOFF") != std::string::npos) return TAKEOFF;
 	else return HOVER;
 }
 

@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
 
-//	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE];
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -57,11 +57,12 @@ int main(int argc, char *argv[])
 		printf("ERROR connecting to socket. Error No: %d \n", errno);
 		exit(EXIT_FAILURE);
 	}
-	char buffer[BUFFER_SIZE] = "TAKEOFF";
+//	char buffer[BUFFER_SIZE] = "TAKEOFF";
 
 	do
 	{
-		//fgets(buffer, BUFFER_SIZE, stdin);
+		printf("MESSAGE: ");
+		fgets(buffer, BUFFER_SIZE, stdin);
 
 		if (write(sockfd, buffer, BUFFER_SIZE) < 0)
 		{
