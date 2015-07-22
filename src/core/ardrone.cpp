@@ -31,17 +31,16 @@ DEFINE_THREAD_ROUTINE(drone_control, data)
 			switch (param->action)
 			{
 				case RIGHT: // roll
-					ardrone_tool_set_progressive_cmd(true, 0.1, 0, 0, 0, 0, 0);
+					ardrone_tool_set_progressive_cmd(true, 0.05, 0, 0, 0, 0, 0);
 				break;
 				case LEFT: // roll
-					std::cout << "left" << std::endl;
-					ardrone_tool_set_progressive_cmd(true, -0.1, 0, 0, 0, 0, 0);
+					ardrone_tool_set_progressive_cmd(true, -0.05, 0, 0, 0, 0, 0);
 				break;
 				case FORWARD: // pitch
-					ardrone_tool_set_progressive_cmd(true, 0, 0.1, 0, 0, 0, 0);
+					ardrone_tool_set_progressive_cmd(true, 0, -0.05, 0, 0, 0, 0);
 				break;
 				case BACKWARD: // pitch
-					ardrone_tool_set_progressive_cmd(true, 0, -0.1, 0, 0, 0, 0);
+					ardrone_tool_set_progressive_cmd(true, 0, 0.05, 0, 0, 0, 0);
 				break;
 				case UP: // gaz
 					ardrone_tool_set_progressive_cmd(false, 0, 0, 0.1, 0, 0, 0);
@@ -51,35 +50,42 @@ DEFINE_THREAD_ROUTINE(drone_control, data)
 							0);
 				break;
 				default:
+					param->ms_time = 0;
 					// do nothing
 				break;
 			}
 
 			clock_gettime(CLOCK_MONOTONIC, &time_now);
 			time_diff_sec = time_now.tv_sec - time_start.tv_sec;
-
-			std::cout << "time diff " << time_diff_sec << " < " << "time left "
-					<< time_left_sec << std::endl;
 		}
 
 		if (param->action == TAKEOFF) // despegue
 		{
-			//ardrone_tool_set_ui_pad_select(0);
 			ardrone_tool_set_ui_pad_start(1);
 		}
 		else if (param->action == LAND) // aterrizaje
 		{
+			ardrone_tool_set_ui_pad_start(0);
+		}
+		else if (param->action == EXIT)
+		{
+			// aterrizo el robot y salgo.
 			ardrone_tool_set_ui_pad_start(0);
 			exit = true;
 		}
 		else // HOVER al final de todo, excepto caundo es TAKEOFF o LAND
 		{
 			ardrone_tool_set_progressive_cmd(false, 0, 0, 0, 0, 0, 0);
+
+			// al final siempre entra aca. Si no le pongo esto, el robot se queda con lo ultimo que le mande.
+			param->action = HOVER;
+			param->ms_time = 0;
 		}
 
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
 		vp_os_mutex_unlock(&param->mutex);
 	}
+
 	return C_OK;
 }
 

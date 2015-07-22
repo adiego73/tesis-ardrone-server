@@ -12,7 +12,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 //	vp_os_mutex_unlock(&param->mutex);
 
-	std::cout << std::endl << "SERVER MAIN START.." << std::endl;
+	std::cout << std::endl << "\tSTARTING SERVER.." << std::endl;
 
 	int sockfd, newsockfd;
 	socklen_t clilen;
@@ -56,7 +56,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	std::string message(buffer, BUFFER_SIZE);
 
-	while (message.compare("LAND") != 0)
+	while (message.find("EXIT") == std::string::npos)
 	{
 		// limpio el buffer
 		bzero(buffer, BUFFER_SIZE);
@@ -68,13 +68,13 @@ DEFINE_THREAD_ROUTINE(server, data)
 		if (request_size < 0)
 		{
 			std::cout << "ERROR reading socket" << errno << std::endl;
-			message = "LAND";
+			message = "EXIT";
 		}
 		else if (request_size == 0) // si el size del request es 0, es porque no hay un cliente conectado.
 		{
 			std::cout << "Client disconnected" << std::endl;
 			// mando el mensaje LAND
-			message = "LAND";
+			message = "EXIT";
 		}
 		else
 		{
@@ -98,7 +98,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 			// esto va a convertir el numero hasta el primer char no convertible. Si no puede convertir nada, devuelve 0
 			time = strtol(time_msg.c_str(), NULL, 10);
 		}
-		else // si no puedo encontrar el | es porque tiene que ser LAND, TAKEOFF o HOVER.
+		else // si no puedo encontrar el | es porque tiene que ser LAND, TAKEOFF, HOVER o EXIT.
 		{
 			action = get_ardrone_action(message);
 			time = 0;
@@ -115,8 +115,11 @@ DEFINE_THREAD_ROUTINE(server, data)
 		if (write(newsockfd, message.c_str(), message.length()) < 0)
 		{
 			std::cout << "ERROR writing the socket: " << errno << std::endl;
+			break;
 		}
 	}
+
+	std::cout << "\tCLOSING SERVER.." << std::endl;
 
 	close(newsockfd);
 	close(sockfd);
@@ -134,6 +137,7 @@ ardrone_action get_ardrone_action(std::string action_str)
 	else if (action_str.find("DOWN") != std::string::npos) return DOWN;
 	else if (action_str.find("LAND") != std::string::npos) return LAND;
 	else if (action_str.find("TAKEOFF") != std::string::npos) return TAKEOFF;
+	else if (action_str.find("EXIT") != std::string::npos) return EXIT;
 	else return HOVER;
 }
 

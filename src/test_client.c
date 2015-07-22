@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 	struct hostent *server;
 
 	char buffer[BUFFER_SIZE];
+	char reponse_buffer[BUFFER_SIZE];
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -57,10 +58,11 @@ int main(int argc, char *argv[])
 		printf("ERROR connecting to socket. Error No: %d \n", errno);
 		exit(EXIT_FAILURE);
 	}
-//	char buffer[BUFFER_SIZE] = "TAKEOFF";
 
 	do
 	{
+		bzero(buffer, BUFFER_SIZE);
+
 		printf("MESSAGE: ");
 		fgets(buffer, BUFFER_SIZE, stdin);
 
@@ -70,15 +72,17 @@ int main(int argc, char *argv[])
 			break;
 		}
 
-		bzero(buffer, BUFFER_SIZE);
+		bzero(reponse_buffer, BUFFER_SIZE);
 
-		if (read(sockfd, buffer, BUFFER_SIZE) < 0)
+		if (read(sockfd, reponse_buffer, BUFFER_SIZE) < 0)
 		{
 			printf("ERROR reading from socket. Error No: %d \n", errno);
 			break;
 		}
 
-	} while (strcmp(buffer, "LAND") != 0);
+	} while (strcmp(buffer, "EXIT") != 0);
+
+	printf("EXIT CLIENT");
 
 	close(sockfd);
 	return 0;

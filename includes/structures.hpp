@@ -7,7 +7,7 @@
 
 typedef enum
 {
-	RIGHT, LEFT, FORWARD, BACKWARD, UP, DOWN, LAND, HOVER, TAKEOFF
+	RIGHT, LEFT, FORWARD, BACKWARD, UP, DOWN, LAND, HOVER, TAKEOFF, EXIT
 } ardrone_action;
 
 struct thread_data
