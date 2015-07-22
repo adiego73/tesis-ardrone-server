@@ -22,6 +22,7 @@ std::string get_state_as_string(uint32_t state);
 
 int main(int argc, char** argv)
 {
+	// TODO add video streaming
 	return ardrone_tool_main(argc, argv);
 }
 
@@ -33,8 +34,6 @@ C_RESULT ardrone_tool_init_custom(void)
 	thread_data * data = (thread_data *) vp_os_calloc(1, sizeof(thread_data));
 
 	vp_os_mutex_init(&data->mutex);
-	// bloqueo el mutex para que entre primero en el server
-	//vp_os_mutex_lock(&data->mutex);
 
 	ardrone_at_set_flat_trim();
 

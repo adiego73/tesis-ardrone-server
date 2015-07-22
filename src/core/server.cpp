@@ -10,8 +10,6 @@ DEFINE_THREAD_ROUTINE(server, data)
 
 	thread_data* param = (thread_data*) data;
 
-//	vp_os_mutex_unlock(&param->mutex);
-
 	std::cout << std::endl << "\tSTARTING SERVER.." << std::endl;
 
 	int sockfd, newsockfd;

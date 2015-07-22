@@ -14,8 +14,6 @@ DEFINE_THREAD_ROUTINE(drone_control, data)
 	timespec time_start, time_now;
 	float time_diff_sec = 0.0f;
 
-	ardrone_tool_set_ui_pad_select(0);
-
 	while (!exit)
 	{
 		vp_os_mutex_lock(&param->mutex);
@@ -85,6 +83,8 @@ DEFINE_THREAD_ROUTINE(drone_control, data)
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
 		vp_os_mutex_unlock(&param->mutex);
 	}
+
+	std::cout << "\tTURNING OFF ARDRONE CONTROL" << std::endl;
 
 	return C_OK;
 }

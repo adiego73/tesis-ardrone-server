@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
 	} while (strcmp(buffer, "EXIT") != 0);
 
-	printf("EXIT CLIENT");
+	printf("\tEXIT CLIENT");
 
 	close(sockfd);
 	return 0;
