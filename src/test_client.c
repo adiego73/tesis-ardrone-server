@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	do
+	while (strcmp(buffer, "EXIT") != 0)
 	{
 		bzero(buffer, BUFFER_SIZE);
 
@@ -80,7 +80,8 @@ int main(int argc, char *argv[])
 			break;
 		}
 
-	} while (strcmp(buffer, "EXIT") != 0);
+		printf("%s", reponse_buffer);
+	}
 
 	printf("\tEXIT CLIENT");
 
