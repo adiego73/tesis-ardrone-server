@@ -3,9 +3,11 @@
 extern "C"
 {
 	#include <ardrone_tool/ardrone_tool.h>
+	#include <ardrone_tool/ardrone_tool_configuration.h>
 	#include <ardrone_tool/Navdata/ardrone_navdata_client.h>
 }
 
+	#include <ardrone_tool/Video/video_stage.h>
 #include <VP_Api/vp_api_thread_helper.h>
 
 #include <ardrone_api.h>
@@ -14,6 +16,7 @@ extern "C"
 
 #include "core/server.hpp"
 #include "core/ardrone.hpp"
+#include "core/video.hpp"
 #include "structures.hpp"
 
 using namespace std;
@@ -31,6 +34,7 @@ int main(int argc, char** argv)
  */
 C_RESULT ardrone_tool_init_custom(void)
 {
+
 	thread_data * data = (thread_data *) vp_os_calloc(1, sizeof(thread_data));
 
 	vp_os_mutex_init(&data->mutex);
@@ -40,6 +44,47 @@ C_RESULT ardrone_tool_init_custom(void)
 	START_THREAD(server, data);
 	START_THREAD(drone_control, data);
 
+	specific_parameters_t* cfg = (specific_parameters_t *) vp_os_calloc(1, sizeof(specific_parameters_t));
+
+	specific_stages_t *pre_stages = (specific_stages_t *)vp_os_calloc (1, sizeof (specific_stages_t));
+	specific_stages_t *post_stages = (specific_stages_t *)vp_os_calloc (1, sizeof (specific_stages_t));
+	vp_api_picture_t *in_picture = (vp_api_picture_t *)vp_os_calloc (1, sizeof (vp_api_picture_t));
+	vp_api_picture_t *out_picture = (vp_api_picture_t *)vp_os_calloc (1, sizeof (vp_api_picture_t));
+
+	out_picture->format = PIX_FMT_RGB24;
+
+	in_picture->width = VGA_WIDTH;
+	in_picture->height = VGA_HEIGHT;
+
+	out_picture->framerate = 24;
+
+	out_picture->width = in_picture->width;
+	out_picture->height	= in_picture->height;
+
+	out_picture->y_buf = (uint8_t *) vp_os_malloc( out_picture->width * out_picture->height * 3 ); // RGB24 needs 3 bytes per pixel
+	out_picture->cr_buf	= NULL;
+	out_picture->cb_buf	= NULL;
+
+	out_picture->y_line_size = out_picture->width * 3; // RGB24 needs 3 bytes per pixel
+	out_picture->cb_line_size = 0;
+	out_picture->cr_line_size = 0;
+
+	// no hay pre-stages
+	pre_stages->length = 0;
+	pre_stages->stages_list = NULL;
+
+	// solo hay 1 post-stage
+	post_stages->length = 1;
+	post_stages->stages_list = (vp_api_io_stage_t*) vp_os_calloc(post_stages->length, sizeof(vp_api_io_stage_t));
+
+	post_stages->stages_list[0].type = VP_API_OUTPUT_SDL; // Debug info
+	post_stages->stages_list[0].cfg  = NULL;
+	post_stages->stages_list[0].funcs  = video_process_functions;
+
+	START_THREAD(video_stage, cfg);
+	video_stage_init();
+	video_stage_resume_thread();
+
 	return C_OK;
 }
 
@@ -47,6 +92,9 @@ C_RESULT ardrone_tool_shutdown_custom(void)
 {
 	JOIN_THREAD(server);
 	JOIN_THREAD(drone_control);
+
+	video_stage_resume_thread();
+	JOIN_THREAD(video_stage);
 
 	return C_OK;
 }
@@ -100,6 +148,7 @@ BEGIN_THREAD_TABLE
 	THREAD_TABLE_ENTRY(server, 20)
 	THREAD_TABLE_ENTRY(drone_control, 20)
 	THREAD_TABLE_ENTRY(navdata_update, 20 )
+	THREAD_TABLE_ENTRY(video_stage, 20)
 END_THREAD_TABLE
 
 BEGIN_NAVDATA_HANDLER_TABLE

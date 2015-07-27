@@ -111,6 +111,7 @@
 									<listOptionValue builtIn="false" value="/home/diego/dev/ardronelib/ARDroneLib/VP_SDK"/>
 									<listOptionValue builtIn="false" value="/home/diego/dev/ardronelib/ARDroneLib/VP_SDK/VP_Os"/>
 									<listOptionValue builtIn="false" value="/home/diego/dev/ardronelib/ARDroneLib/VP_SDK/VP_Os/linux"/>
+									<listOptionValue builtIn="false" value="/usr/local/include/opencv2"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.1444017801" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.996060984" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -141,6 +142,10 @@
 									<listOptionValue builtIn="false" value="pc_ardrone"/>
 									<listOptionValue builtIn="false" value="pc_ardrone_notool"/>
 									<listOptionValue builtIn="false" value="sdk"/>
+									<listOptionValue builtIn="false" value="opencv_core"/>
+									<listOptionValue builtIn="false" value="opencv_highgui"/>
+									<listOptionValue builtIn="false" value="opencv_video"/>
+									<listOptionValue builtIn="false" value="opencv_imgproc"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1720920954" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
