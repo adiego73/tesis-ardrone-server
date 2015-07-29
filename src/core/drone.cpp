@@ -1,6 +1,6 @@
-#include "core/ardrone.hpp"
+#include "core/drone.hpp"
 
-DEFINE_THREAD_ROUTINE(drone_control, data)
+void* drone_control(void* data)
 {
 	if (data == NULL)
 	{
@@ -14,9 +14,16 @@ DEFINE_THREAD_ROUTINE(drone_control, data)
 	timespec time_start, time_now;
 	float time_diff_sec = 0.0f;
 
+	ARDrone ardrone;
+
+	if (!ardrone.open("192.168.1.1"))
+	{
+		std::cout << "ERROR when connecting to ARDrone" << std::endl;
+	}
+
 	while (!exit)
 	{
-		vp_os_mutex_lock(&param->mutex);
+		pthread_mutex_lock(&param->mutex);
 
 		float time_left_sec = (float) param->ms_time / 1000.0f;
 		time_diff_sec = 0.0f;
@@ -29,23 +36,22 @@ DEFINE_THREAD_ROUTINE(drone_control, data)
 			switch (param->action)
 			{
 				case RIGHT: // roll
-					ardrone_tool_set_progressive_cmd(true, 0.05, 0, 0, 0, 0, 0);
+					ardrone.move3D(0, 0, 0, -0.05);
 				break;
 				case LEFT: // roll
-					ardrone_tool_set_progressive_cmd(true, -0.05, 0, 0, 0, 0, 0);
+					ardrone.move3D(0, 0, 0, 0.05);
 				break;
 				case FORWARD: // pitch
-					ardrone_tool_set_progressive_cmd(true, 0, -0.05, 0, 0, 0, 0);
+					ardrone.move3D(0.05, 0, 0, 0);
 				break;
 				case BACKWARD: // pitch
-					ardrone_tool_set_progressive_cmd(true, 0, 0.05, 0, 0, 0, 0);
+					ardrone.move3D(-0.05, 0, 0, 0);
 				break;
 				case UP: // gaz
-					ardrone_tool_set_progressive_cmd(false, 0, 0, 0.1, 0, 0, 0);
+					ardrone.move3D(0, 0, 0.1, 0);
 				break;
 				case DOWN: // gaz
-					ardrone_tool_set_progressive_cmd(false, 0, 0, -0.1, 0, 0,
-							0);
+					ardrone.move3D(0, 0, -0.1, 0);
 				break;
 				default:
 					param->ms_time = 0;
@@ -59,33 +65,35 @@ DEFINE_THREAD_ROUTINE(drone_control, data)
 
 		if (param->action == TAKEOFF) // despegue
 		{
-			ardrone_tool_set_ui_pad_start(1);
+			ardrone.takeoff();
 		}
 		else if (param->action == LAND) // aterrizaje
 		{
-			ardrone_tool_set_ui_pad_start(0);
+			ardrone.landing();
 		}
-		else if (param->action == EXIT)
+		else if (param->action == END)
 		{
 			// aterrizo el robot y salgo.
-			ardrone_tool_set_ui_pad_start(0);
+			ardrone.landing();
 			exit = true;
 		}
 		else // HOVER al final de todo, excepto caundo es TAKEOFF o LAND
 		{
-			ardrone_tool_set_progressive_cmd(false, 0, 0, 0, 0, 0, 0);
-
+			ardrone.move3D(0, 0, 0, 0);
 			// al final siempre entra aca. Si no le pongo esto, el robot se queda con lo ultimo que le mande.
 			param->action = HOVER;
 			param->ms_time = 0;
 		}
 
+		// obtengo el frame del robot.
+		cv::Mat img = ardrone.getImage();
+		param->frame = img;
+
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
-		vp_os_mutex_unlock(&param->mutex);
+		pthread_mutex_unlock(&param->mutex);
 	}
 
 	std::cout << "\tTURNING OFF ARDRONE CONTROL" << std::endl;
 
-	return C_OK;
+	return END_OK;
 }
-

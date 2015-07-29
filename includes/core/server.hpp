@@ -13,12 +13,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include <vp_os_signal.h>
-#include <vp_os_thread.h>
-#include <vp_os_types.h>
-
-#include <VP_Api/vp_api_thread_helper.h>
-
 #include "structures.hpp"
 
 
@@ -30,8 +24,8 @@
 #define BUFFER_SIZE 256
 #endif
 
-PROTO_THREAD_ROUTINE(server, data);
-
 ardrone_action get_ardrone_action(std::string action_str);
+
+void* server(void* data);
 
 #endif // end SERVER_HPP_

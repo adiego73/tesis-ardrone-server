@@ -1,6 +1,6 @@
 #include <core/server.hpp>
 
-DEFINE_THREAD_ROUTINE(server, data)
+void* server(void* data)
 {
 	if (data == NULL)
 	{
@@ -102,12 +102,12 @@ DEFINE_THREAD_ROUTINE(server, data)
 			time = 0;
 		}
 
-		vp_os_mutex_lock(&param->mutex);
+		pthread_mutex_lock(&param->mutex);
 
 		param->action = action;
 		param->ms_time = time;
 
-		vp_os_mutex_unlock(&param->mutex);
+		pthread_mutex_unlock(&param->mutex);
 
 		// devuelvo lo mismo que recibo. Si hay un error informo, y sigo.
 		if (write(newsockfd, message.c_str(), message.length()) < 0)
@@ -122,7 +122,7 @@ DEFINE_THREAD_ROUTINE(server, data)
 	close(newsockfd);
 	close(sockfd);
 
-	return C_OK;
+	return END_OK;
 }
 
 ardrone_action get_ardrone_action(std::string action_str)
@@ -135,7 +135,7 @@ ardrone_action get_ardrone_action(std::string action_str)
 	else if (action_str.find("DOWN") != std::string::npos) return DOWN;
 	else if (action_str.find("LAND") != std::string::npos) return LAND;
 	else if (action_str.find("TAKEOFF") != std::string::npos) return TAKEOFF;
-	else if (action_str.find("EXIT") != std::string::npos) return EXIT;
+	else if (action_str.find("EXIT") != std::string::npos) return END;
 	else return HOVER;
 }
 
