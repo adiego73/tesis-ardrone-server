@@ -2,6 +2,8 @@
 #include <iostream>
 
 #include "core/server.hpp"
+#include "core/video_server.hpp"
+#include "core/drone.hpp"
 #include "structures.hpp"
 
 using namespace std;

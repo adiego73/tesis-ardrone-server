@@ -2,6 +2,8 @@
 #define STRUCTURES_HPP_
 
 #include <string>
+#include <pthread.h>
+#include <opencv.hpp>
 
 #ifndef END_OK
 #define END_OK 0
@@ -11,10 +13,10 @@
 #define END_FAIL -1
 #endif
 
-typedef enum
+enum ardrone_action
 {
 	RIGHT, LEFT, FORWARD, BACKWARD, UP, DOWN, LAND, HOVER, TAKEOFF, END
-} ardrone_action;
+};
 
 
 struct thread_data

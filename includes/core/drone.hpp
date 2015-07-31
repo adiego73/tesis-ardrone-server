@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "classes/ardrone.hpp"
 #include "structures.hpp"
 
 
@@ -16,6 +17,6 @@
 #define BUFFER_SIZE 256
 #endif
 
-int drone_control(void* data);
+void* drone_control(void* data);
 
 #endif // end DRONE_HPP_
