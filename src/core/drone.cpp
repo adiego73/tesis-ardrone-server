@@ -1,14 +1,12 @@
 #include "core/drone.hpp"
 
-void* drone_control(void* data)
+void drone_control(thread_data* param)
 {
-	if (data == NULL)
+	if (param == NULL)
 	{
-		std::cout << "DATA cannot be NULL" << std::endl;
+		std::cerr << "ERROR THREAD DATA cannot be NULL" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-
-	thread_data* param = (thread_data*) data;
 
 	bool exit = false;
 	timespec time_start, time_now;
@@ -18,12 +16,13 @@ void* drone_control(void* data)
 
 	if (!ardrone.open("192.168.1.1"))
 	{
-		std::cout << "ERROR when connecting to ARDrone" << std::endl;
+		std::cerr << "ERROR when connecting to ARDrone" << std::endl;
+		std::exit(EXIT_FAILURE);
 	}
 
 	while (!exit)
 	{
-		pthread_mutex_lock(&param->mutex);
+		param->m_mutex.lock();
 
 		float time_left_sec = (float) param->ms_time / 1000.0f;
 		time_diff_sec = 0.0f;
@@ -87,13 +86,14 @@ void* drone_control(void* data)
 
 		// obtengo el frame del robot.
 		cv::Mat img = ardrone.getImage();
-		param->frame = img;
+
+		img.copyTo(param->frame);
 
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
-		pthread_mutex_unlock(&param->mutex);
+		param->m_mutex.unlock();
 	}
 
 	std::cout << "\tTURNING OFF ARDRONE CONTROL" << std::endl;
 
-	return END_OK;
+	ardrone.close();
 }

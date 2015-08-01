@@ -1,23 +1,25 @@
-#include <classes/ardrone.hpp>
 #include <iostream>
+#include <stdlib.h>
 
+#include "classes/ardrone.hpp"
 #include "core/server.hpp"
 #include "core/video_server.hpp"
 #include "core/drone.hpp"
+
 #include "structures.hpp"
 
 using namespace std;
 
 int main(int argc, char** argv)
 {
-	thread_data* data = (thread_data*)malloc(sizeof(thread_data));
+	thread_data* data = (thread_data*) malloc(sizeof(thread_data));
 
-	pthread_t threads[3];
+	boost::thread t_server(server, data);
+	boost::thread t_drone(drone_control, data);
+	boost::thread t_video(video_server, data);
 
-	pthread_mutex_init(&data->mutex, NULL);
-
-	pthread_create(&threads[0], NULL, server, &data);
-	pthread_create(&threads[1], NULL, drone_control, &data);
-	pthread_create(&threads[2], NULL, video_server, &data);
+	t_server.join();
+	t_drone.join();
+	t_video.join();
 
 }

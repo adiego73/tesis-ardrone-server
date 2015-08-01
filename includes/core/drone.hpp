@@ -17,6 +17,6 @@
 #define BUFFER_SIZE 256
 #endif
 
-void* drone_control(void* data);
+void drone_control(thread_data* data);
 
 #endif // end DRONE_HPP_

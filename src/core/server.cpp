@@ -1,14 +1,12 @@
-#include <core/server.hpp>
+#include "core/server.hpp"
 
-void* server(void* data)
+void server(thread_data* param)
 {
-	if (data == NULL)
+	if (param == NULL)
 	{
-		std::cout << "DATA cannot be NULL" << std::endl;
+		std::cerr << "THREAD DATA cannot be NULL" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-
-	thread_data* param = (thread_data*) data;
 
 	std::cout << std::endl << "\tSTARTING SERVER.." << std::endl;
 
@@ -22,7 +20,7 @@ void* server(void* data)
 
 	if (sockfd < 0)
 	{
-		std::cout << "ERROR opening socket";
+		std::cerr << "ERROR opening socket";
 		exit(EXIT_FAILURE);
 	}
 
@@ -36,7 +34,7 @@ void* server(void* data)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		std::cout << "ERROR on binding " << errno << std::endl;
+		std::cerr << "ERROR on binding " << errno << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -48,7 +46,7 @@ void* server(void* data)
 
 	if (newsockfd < 0)
 	{
-		std::cout << "ERROR on accept " << errno << std::endl;
+		std::cerr << "ERROR on accept " << errno << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -65,7 +63,7 @@ void* server(void* data)
 		// request_size representa el total de bytes leidos
 		if (request_size < 0)
 		{
-			std::cout << "ERROR reading socket" << errno << std::endl;
+			std::cerr << "ERROR reading socket" << errno << std::endl;
 			message = "EXIT";
 		}
 		else if (request_size == 0) // si el size del request es 0, es porque no hay un cliente conectado.
@@ -102,17 +100,17 @@ void* server(void* data)
 			time = 0;
 		}
 
-		pthread_mutex_lock(&param->mutex);
+		param->m_mutex.lock();
 
 		param->action = action;
 		param->ms_time = time;
 
-		pthread_mutex_unlock(&param->mutex);
+		param->m_mutex.unlock();
 
 		// devuelvo lo mismo que recibo. Si hay un error informo, y sigo.
 		if (write(newsockfd, message.c_str(), message.length()) < 0)
 		{
-			std::cout << "ERROR writing the socket: " << errno << std::endl;
+			std::cerr << "ERROR writing the socket: " << errno << std::endl;
 			break;
 		}
 	}
@@ -121,8 +119,6 @@ void* server(void* data)
 
 	close(newsockfd);
 	close(sockfd);
-
-	return END_OK;
 }
 
 ardrone_action get_ardrone_action(std::string action_str)

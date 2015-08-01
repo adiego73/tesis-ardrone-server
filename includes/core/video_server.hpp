@@ -3,6 +3,6 @@
 
 #include "structures.hpp"
 
-void* video_server(void* data);
+void video_server(thread_data* data);
 
 #endif // VIDEO_SERVER_HPP_

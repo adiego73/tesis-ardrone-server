@@ -26,6 +26,6 @@
 
 ardrone_action get_ardrone_action(std::string action_str);
 
-void* server(void* data);
+void server(thread_data* data);
 
 #endif // end SERVER_HPP_

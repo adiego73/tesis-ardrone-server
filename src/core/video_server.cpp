@@ -1,7 +1,8 @@
 #include "core/video_server.hpp"
 
-void* video_server(void* data)
+void video_server(thread_data* param)
 {
-
-	return END_OK;
+	while(1)
+	{
+	}
 }
