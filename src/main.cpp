@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include <boost/shared_ptr.hpp>
+
 #include "classes/ardrone.hpp"
 #include "core/server.hpp"
 #include "core/video_server.hpp"
@@ -12,14 +14,28 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	thread_data* data = (thread_data*) malloc(sizeof(thread_data));
+	boost::shared_ptr<thread_data> data(new thread_data());
+	boost::shared_ptr<ARDrone> ardrone(new ARDrone());
+
+	if (ardrone->open("192.168.1.1") != 1)
+	{
+		std::cerr << "ERROR when connecting to ARDrone" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	cout << "Batery level: " << ardrone->getBatteryPercentage() << " %" << endl;
+
+	ardrone->setCamera(0);
+	ardrone->setFlatTrim();
 
 	boost::thread t_server(server, data);
-	boost::thread t_drone(drone_control, data);
-	boost::thread t_video(video_server, data);
+	boost::thread t_drone(drone_control, data, ardrone);
+	boost::thread t_video(video_server, data, ardrone);
 
 	t_server.join();
 	t_drone.join();
 	t_video.join();
+
+	ardrone->close();
 
 }

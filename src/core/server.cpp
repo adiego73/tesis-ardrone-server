@@ -1,6 +1,6 @@
 #include "core/server.hpp"
 
-void server(thread_data* param)
+void server(boost::shared_ptr<thread_data> param)
 {
 	if (param == NULL)
 	{
@@ -52,7 +52,8 @@ void server(thread_data* param)
 
 	std::string message(buffer, BUFFER_SIZE);
 
-	while (message.find("EXIT") == std::string::npos)
+	while (message.find("EXIT") == std::string::npos
+			&& message.find("END") == std::string::npos)
 	{
 		// limpio el buffer
 		bzero(buffer, BUFFER_SIZE);
@@ -132,6 +133,7 @@ ardrone_action get_ardrone_action(std::string action_str)
 	else if (action_str.find("LAND") != std::string::npos) return LAND;
 	else if (action_str.find("TAKEOFF") != std::string::npos) return TAKEOFF;
 	else if (action_str.find("EXIT") != std::string::npos) return END;
+	else if (action_str.find("END") != std::string::npos) return END;
 	else return HOVER;
 }
 

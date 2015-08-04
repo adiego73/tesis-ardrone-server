@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+#include <boost/shared_ptr.hpp>
 
 #include "classes/ardrone.hpp"
 #include "structures.hpp"
@@ -17,6 +18,6 @@
 #define BUFFER_SIZE 256
 #endif
 
-void drone_control(thread_data* data);
+void drone_control(boost::shared_ptr<thread_data> data, boost::shared_ptr<ARDrone> ardrone);
 
 #endif // end DRONE_HPP_

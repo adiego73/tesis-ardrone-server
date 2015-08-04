@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <boost/shared_ptr.hpp>
 
 #include "structures.hpp"
 
@@ -26,6 +27,6 @@
 
 ardrone_action get_ardrone_action(std::string action_str);
 
-void server(thread_data* data);
+void server(boost::shared_ptr<thread_data> data);
 
 #endif // end SERVER_HPP_

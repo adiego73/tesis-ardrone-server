@@ -1,6 +1,7 @@
 #include "core/drone.hpp"
 
-void drone_control(thread_data* param)
+void drone_control(boost::shared_ptr<thread_data> param,
+		boost::shared_ptr<ARDrone> ardrone)
 {
 	if (param == NULL)
 	{
@@ -8,20 +9,13 @@ void drone_control(thread_data* param)
 		exit(EXIT_FAILURE);
 	}
 
-	bool exit = false;
+	bool end = false;
 	timespec time_start, time_now;
 	float time_diff_sec = 0.0f;
 
-	ARDrone ardrone;
-
-	if (!ardrone.open("192.168.1.1"))
+	while (!end)
 	{
-		std::cerr << "ERROR when connecting to ARDrone" << std::endl;
-		std::exit(EXIT_FAILURE);
-	}
-
-	while (!exit)
-	{
+		// mutex lock
 		param->m_mutex.lock();
 
 		float time_left_sec = (float) param->ms_time / 1000.0f;
@@ -35,22 +29,22 @@ void drone_control(thread_data* param)
 			switch (param->action)
 			{
 				case RIGHT: // roll
-					ardrone.move3D(0, 0, 0, -0.05);
+					ardrone->move3D(0, -0.05, 0, 0);
 				break;
 				case LEFT: // roll
-					ardrone.move3D(0, 0, 0, 0.05);
+					ardrone->move3D(0, 0.05, 0, 0);
 				break;
 				case FORWARD: // pitch
-					ardrone.move3D(0.05, 0, 0, 0);
+					ardrone->move3D(0.05, 0, 0, 0);
 				break;
 				case BACKWARD: // pitch
-					ardrone.move3D(-0.05, 0, 0, 0);
+					ardrone->move3D(-0.05, 0, 0, 0);
 				break;
 				case UP: // gaz
-					ardrone.move3D(0, 0, 0.1, 0);
+					ardrone->move3D(0, 0, 0.1, 0);
 				break;
 				case DOWN: // gaz
-					ardrone.move3D(0, 0, -0.1, 0);
+					ardrone->move3D(0, 0, -0.1, 0);
 				break;
 				default:
 					param->ms_time = 0;
@@ -64,36 +58,30 @@ void drone_control(thread_data* param)
 
 		if (param->action == TAKEOFF) // despegue
 		{
-			ardrone.takeoff();
+			ardrone->takeoff();
 		}
 		else if (param->action == LAND) // aterrizaje
 		{
-			ardrone.landing();
+			ardrone->landing();
 		}
 		else if (param->action == END)
 		{
 			// aterrizo el robot y salgo.
-			ardrone.landing();
-			exit = true;
+			ardrone->landing();
+			end = true;
 		}
 		else // HOVER al final de todo, excepto caundo es TAKEOFF o LAND
 		{
-			ardrone.move3D(0, 0, 0, 0);
-			// al final siempre entra aca. Si no le pongo esto, el robot se queda con lo ultimo que le mande.
-			param->action = HOVER;
-			param->ms_time = 0;
+			ardrone->move3D(0, 0, 0, 0);
 		}
 
-		// obtengo el frame del robot.
-		cv::Mat img = ardrone.getImage();
-
-		img.copyTo(param->frame);
+		// al final siempre entra aca. Si no le pongo esto, el robot se queda con lo ultimo que le mande.
+		param->action = HOVER;
+		param->ms_time = 0;
 
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
 		param->m_mutex.unlock();
 	}
 
 	std::cout << "\tTURNING OFF ARDRONE CONTROL" << std::endl;
-
-	ardrone.close();
 }

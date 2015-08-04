@@ -5,6 +5,9 @@
 #include <pthread.h>
 #include <opencv.hpp>
 #include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include "classes/ardrone.hpp"
 
 #ifndef END_OK
 #define END_OK 0
@@ -29,7 +32,6 @@ typedef struct
 		boost::mutex m_mutex;
 		ardrone_action action;
 		unsigned int ms_time;
-		cv::Mat frame;
 }thread_data;
 
 #ifndef __DEBUG__
