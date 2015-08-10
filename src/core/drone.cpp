@@ -29,22 +29,22 @@ void drone_control(boost::shared_ptr<thread_data> param,
 			switch (param->action)
 			{
 				case RIGHT: // roll
-					ardrone->move3D(0, -0.05, 0, 0);
+					ardrone->move3D(0, -0.5, 0, 0);
 				break;
 				case LEFT: // roll
-					ardrone->move3D(0, 0.05, 0, 0);
+					ardrone->move3D(0, 0.5, 0, 0);
 				break;
 				case FORWARD: // pitch
-					ardrone->move3D(0.05, 0, 0, 0);
+					ardrone->move3D(0.5, 0, 0, 0);
 				break;
 				case BACKWARD: // pitch
-					ardrone->move3D(-0.05, 0, 0, 0);
+					ardrone->move3D(-0.5, 0, 0, 0);
 				break;
 				case UP: // gaz
-					ardrone->move3D(0, 0, 0.1, 0);
+					ardrone->move3D(0, 0, 1, 0);
 				break;
 				case DOWN: // gaz
-					ardrone->move3D(0, 0, -0.1, 0);
+					ardrone->move3D(0, 0, 1, 0);
 				break;
 				default:
 					param->ms_time = 0;

@@ -2,7 +2,6 @@
 #define STRUCTURES_HPP_
 
 #include <string>
-#include <pthread.h>
 #include <opencv.hpp>
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
