@@ -28,9 +28,10 @@ enum ardrone_action
 
 typedef struct
 {
-		boost::mutex m_mutex;
+		boost::shared_mutex m_mutex;
 		ardrone_action action;
 		unsigned int ms_time;
+		bool finish;
 }thread_data;
 
 #ifndef __DEBUG__

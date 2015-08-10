@@ -9,14 +9,14 @@ void drone_control(boost::shared_ptr<thread_data> param,
 		exit(EXIT_FAILURE);
 	}
 
-	bool end = false;
+	bool finish = false;
 	timespec time_start, time_now;
 	float time_diff_sec = 0.0f;
 
-	while (!end)
+	while (!finish)
 	{
 		// mutex lock
-		param->m_mutex.lock();
+		param->m_mutex.lock_shared();
 
 		float time_left_sec = (float) param->ms_time / 1000.0f;
 		time_diff_sec = 0.0f;
@@ -68,7 +68,7 @@ void drone_control(boost::shared_ptr<thread_data> param,
 		{
 			// aterrizo el robot y salgo.
 			ardrone->landing();
-			end = true;
+			finish = param->finish;
 		}
 		else // HOVER al final de todo, excepto caundo es TAKEOFF o LAND
 		{
@@ -80,7 +80,7 @@ void drone_control(boost::shared_ptr<thread_data> param,
 		param->ms_time = 0;
 
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
-		param->m_mutex.unlock();
+		param->m_mutex.unlock_shared();
 	}
 
 	std::cout << "\tTURNING OFF ARDRONE CONTROL" << std::endl;

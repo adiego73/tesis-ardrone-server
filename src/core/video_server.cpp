@@ -12,6 +12,8 @@ void video_server(boost::shared_ptr<thread_data> param,
 		exit(EXIT_FAILURE);
 	}
 
+	bool finish = false;
+
 	cv::Mat frame;
 	cv::Mat imageToSend;
 	cv::namedWindow("camera", CV_WINDOW_AUTOSIZE);
@@ -40,7 +42,7 @@ void video_server(boost::shared_ptr<thread_data> param,
 		exit(EXIT_FAILURE);
 	}
 
-	while (true)
+	while (!finish)
 	{
 		frame = ardrone->getImage();
 
@@ -55,18 +57,23 @@ void video_server(boost::shared_ptr<thread_data> param,
 
 			int send = sendto(sockfd, imageToSend.data, size, 0, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
 
-			if(send == -1)
+			if(send < 0)
 			{
 				std::cerr << "ERROR sending frame via UDP socket: " << errno << std::endl;
 			}
 		}
-
 		cv::waitKey(1);
+
+		// read-only mutex
+		param->m_mutex.lock_shared();
+		finish = param->finish;
+		param->m_mutex.unlock_shared();
 	}
 
 	std::cout << "\tTURNING OFF VIDEO SERVER" << std::endl;
 
 	cv::destroyAllWindows();
 	frame.deallocate();
+	imageToSend.deallocate();
 	close(sockfd);
 }

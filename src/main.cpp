@@ -36,19 +36,25 @@ int main(int argc, char** argv)
 
 	ardrone->setCamera(0);
 	ardrone->setFlatTrim();
+	data->finish = false;
 
 	boost::thread t_server(server, data);
 	boost::thread t_drone(drone_control, data, ardrone);
+
 	if(with_video)
 	{
 		boost::thread t_video(video_server, data, ardrone);
+		t_video.join();
 	}
 
+	// threads join
 	t_server.join();
 	t_drone.join();
 
+	// deallocation
 	ardrone->close();
 	t_server.~thread();
 	t_drone.~thread();
-
+	data.reset();
+	ardrone.reset();
 }
