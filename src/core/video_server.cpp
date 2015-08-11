@@ -4,13 +4,13 @@
 void video_server(boost::shared_ptr<thread_data> param,
 		boost::shared_ptr<ARDrone> ardrone)
 {
-	std::cout << "\tSTART VIDEO SERVER" << std::endl;
-
 	if (param == NULL)
 	{
 		std::cerr << "THREAD DATA cannot be NULL" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
+	std::cout << "\tSTARTING VIDEO SERVER..." << std::endl;
 
 	bool finish = false;
 
@@ -48,9 +48,8 @@ void video_server(boost::shared_ptr<thread_data> param,
 
 		if (!frame.empty())
 		{
-			cv::imshow("camera", frame);
-
 			cv::resize(frame, imageToSend, cv::Size(180, 120), 0, 0, cv::INTER_LINEAR);
+			cv::imshow("camera", imageToSend);
 
 			imageToSend = (imageToSend.reshape(0, 1));
 			int size = imageToSend.total() * imageToSend.elemSize();
@@ -64,7 +63,6 @@ void video_server(boost::shared_ptr<thread_data> param,
 		}
 		cv::waitKey(1);
 
-		// read-only mutex
 		param->m_mutex.lock_shared();
 		finish = param->finish;
 		param->m_mutex.unlock_shared();
@@ -73,7 +71,7 @@ void video_server(boost::shared_ptr<thread_data> param,
 	std::cout << "\tTURNING OFF VIDEO SERVER" << std::endl;
 
 	cv::destroyAllWindows();
-	frame.deallocate();
-	imageToSend.deallocate();
+	frame.release();
+	imageToSend.release();
 	close(sockfd);
 }

@@ -9,14 +9,16 @@ void drone_control(boost::shared_ptr<thread_data> param,
 		exit(EXIT_FAILURE);
 	}
 
+	std::cout << "\tSTARTING ARDRONE CONTROL..." << std::endl;
+
 	bool finish = false;
 	timespec time_start, time_now;
 	float time_diff_sec = 0.0f;
 
 	while (!finish)
 	{
-		// mutex lock
-		param->m_mutex.lock_shared();
+		// read only mutex lock
+		param->m_mutex.lock();
 
 		float time_left_sec = (float) param->ms_time / 1000.0f;
 		time_diff_sec = 0.0f;
@@ -36,6 +38,7 @@ void drone_control(boost::shared_ptr<thread_data> param,
 				break;
 				case FORWARD: // pitch
 					ardrone->move3D(0.5, 0, 0, 0);
+					std::cout << "forward|" << param->ms_time << std::endl;
 				break;
 				case BACKWARD: // pitch
 					ardrone->move3D(-0.5, 0, 0, 0);
@@ -58,11 +61,11 @@ void drone_control(boost::shared_ptr<thread_data> param,
 
 		if (param->action == TAKEOFF) // despegue
 		{
-			ardrone->takeoff();
+			if (ardrone->onGround() == 1) ardrone->takeoff();
 		}
 		else if (param->action == LAND) // aterrizaje
 		{
-			ardrone->landing();
+			if (ardrone->onGround() == 0) ardrone->landing();
 		}
 		else if (param->action == END)
 		{
@@ -72,15 +75,14 @@ void drone_control(boost::shared_ptr<thread_data> param,
 		}
 		else // HOVER al final de todo, excepto caundo es TAKEOFF o LAND
 		{
-			ardrone->move3D(0, 0, 0, 0);
+			if (ardrone->onGround() == 0) ardrone->move3D(0, 0, 0, 0);
+
+			param->action = HOVER;
+			param->ms_time = 0;
 		}
 
-		// al final siempre entra aca. Si no le pongo esto, el robot se queda con lo ultimo que le mande.
-		param->action = HOVER;
-		param->ms_time = 0;
-
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
-		param->m_mutex.unlock_shared();
+		param->m_mutex.unlock();
 	}
 
 	std::cout << "\tTURNING OFF ARDRONE CONTROL" << std::endl;

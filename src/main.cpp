@@ -53,8 +53,4 @@ int main(int argc, char** argv)
 
 	// deallocation
 	ardrone->close();
-	t_server.~thread();
-	t_drone.~thread();
-	data.reset();
-	ardrone.reset();
 }
