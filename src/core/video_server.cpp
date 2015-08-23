@@ -48,8 +48,9 @@ void video_server(boost::shared_ptr<thread_data> param,
 
 		if (!frame.empty())
 		{
+			// resize image to fit the datagram max size.
 			cv::resize(frame, imageToSend, cv::Size(180, 120), 0, 0, cv::INTER_LINEAR);
-			cv::imshow("camera", imageToSend);
+			cv::imshow("camera", frame);
 
 			imageToSend = (imageToSend.reshape(0, 1));
 			int size = imageToSend.total() * imageToSend.elemSize();
@@ -64,7 +65,7 @@ void video_server(boost::shared_ptr<thread_data> param,
 		cv::waitKey(1);
 
 		param->m_mutex.lock_shared();
-		finish = param->finish;
+		finish = (param->action == END);
 		param->m_mutex.unlock_shared();
 	}
 

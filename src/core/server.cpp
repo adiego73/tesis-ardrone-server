@@ -105,7 +105,6 @@ void server(boost::shared_ptr<thread_data> param)
 
 		param->action = action;
 		param->ms_time = time;
-		param->finish = (action == END);
 
 		param->m_mutex.unlock();
 

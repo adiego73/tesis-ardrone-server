@@ -17,7 +17,7 @@ void drone_control(boost::shared_ptr<thread_data> param,
 
 	while (!finish)
 	{
-		// read only mutex lock
+		// mutex lock
 		param->m_mutex.lock();
 
 		float time_left_sec = (float) param->ms_time / 1000.0f;
@@ -38,7 +38,6 @@ void drone_control(boost::shared_ptr<thread_data> param,
 				break;
 				case FORWARD: // pitch
 					ardrone->move3D(0.5, 0, 0, 0);
-					std::cout << "forward|" << param->ms_time << std::endl;
 				break;
 				case BACKWARD: // pitch
 					ardrone->move3D(-0.5, 0, 0, 0);
@@ -47,7 +46,7 @@ void drone_control(boost::shared_ptr<thread_data> param,
 					ardrone->move3D(0, 0, 1, 0);
 				break;
 				case DOWN: // gaz
-					ardrone->move3D(0, 0, 1, 0);
+					ardrone->move3D(0, 0, -1, 0);
 				break;
 				default:
 					param->ms_time = 0;
@@ -71,15 +70,15 @@ void drone_control(boost::shared_ptr<thread_data> param,
 		{
 			// aterrizo el robot y salgo.
 			ardrone->landing();
-			finish = param->finish;
+			finish = true;
 		}
 		else // HOVER al final de todo, excepto caundo es TAKEOFF o LAND
 		{
 			if (ardrone->onGround() == 0) ardrone->move3D(0, 0, 0, 0);
-
-			param->action = HOVER;
-			param->ms_time = 0;
 		}
+
+		param->action = HOVER;
+		param->ms_time = 0;
 
 		// no se puede pasar ningun parametro hasta que se desbloquee la memoria.
 		param->m_mutex.unlock();

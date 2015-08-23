@@ -36,7 +36,6 @@ int main(int argc, char** argv)
 
 	ardrone->setCamera(0);
 	ardrone->setFlatTrim();
-	data->finish = false;
 
 	boost::thread t_server(server, data);
 	boost::thread t_drone(drone_control, data, ardrone);
