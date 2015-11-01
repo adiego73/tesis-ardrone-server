@@ -5,8 +5,7 @@
 #include <opencv.hpp>
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
-
-#include "classes/ardrone.hpp"
+#include <ardrone.h>
 
 #ifndef END_OK
 #define END_OK 0

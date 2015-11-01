@@ -21,7 +21,7 @@
 #define HOST_NAME "localhost"
 #endif
 
-int main(int argc, char *argv[])
+int _main(int argc, char *argv[])
 {
 	int sockfd;
 	struct sockaddr_in serv_addr;

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <boost/shared_ptr.hpp>
+#include <ardrone.h>
 
-#include "classes/ardrone.hpp"
 #include "core/server.hpp"
 #include "core/video_server.hpp"
 #include "core/drone.hpp"

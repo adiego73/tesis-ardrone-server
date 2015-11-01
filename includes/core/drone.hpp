@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <boost/shared_ptr.hpp>
+#include <ardrone.h>
 
-#include "classes/ardrone.hpp"
 #include "structures.hpp"
 
 

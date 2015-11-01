@@ -1,5 +1,6 @@
+#include <ardrone.h>
+
 #include "core/video_server.hpp"
-#include "classes/ardrone.hpp"
 
 void video_server(boost::shared_ptr<thread_data> param,
 		boost::shared_ptr<ARDrone> ardrone)
