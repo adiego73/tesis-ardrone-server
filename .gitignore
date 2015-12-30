@@ -22,13 +22,19 @@
 *.a
 *.lib
 
+# User files
+*.user
+
 # Executables
 *.exe
 *.out
 *.app
+
+# Directories
 /Debug/
 /Release/
 /debug-main/
 /debug-test-client/
 /main-server-debug/
 /main debug/
+/bin/
