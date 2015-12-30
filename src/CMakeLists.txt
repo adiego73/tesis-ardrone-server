@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.4)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build/)
 set(USER_LIB_PATH "/usr/local/lib")
 set(BOOST_LIB_PATH "/opt/boost_1_57_0/lib")
 set(CVDRONE_LIB_PATH "/opt/cvdrone/lib")
